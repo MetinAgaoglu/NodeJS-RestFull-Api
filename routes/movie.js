@@ -25,7 +25,7 @@ router.get('/',(req,res)=>{
         }
     ]);
     promise.then((data)=>{
-        res.json(data);
+        res.json({status:true,contents:data});
     }).catch((err)=>{
         res.json(err);
     });
