@@ -109,4 +109,53 @@ describe('Node Server',() => {
             });
     });
 
+    describe('/PUT movie', () => {
+        it('it should PUT a movie', (done) => {
+            const movie = {
+                title: 'update',
+                director_id: '5b2e6510edb32304082bc910',
+                category: 'update',
+                country: 'update',
+                year:2000,
+                imdb_score: 9
+            }
+
+            chai.request(server)
+                .put('/api/movies/'+movie_id)
+                .send(movie)
+                .set('x-access-token',token)
+                .end((err,res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.be.a('object')
+                    res.body.should.have.property('status');
+                    res.body.status.should.equal(true);
+                    res.body.data.should.have.property('_id').eql(movie_id);
+                    res.body.data.should.have.property('title').eql('update');
+                    res.body.data.should.have.property('director_id');
+                    res.body.data.should.have.property('category').eql('update');
+                    res.body.data.should.have.property('country');
+                    res.body.data.should.have.property('imdb_score').eql(9);
+                    done();
+                });
+
+        });
+    });
+
+    describe('/DELETE movie', () => {
+        it('it should PUT a movie', (done) => {
+            console.log('del'+movie_id);
+            chai.request(server)
+                .delete('/api/movies/'+movie_id)
+                .set('x-access-token',token)
+                .end((err,res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.be.a('object')
+                    res.body.should.have.property('status');
+                    res.body.status.should.equal(true);
+                    done();
+                });
+
+        });
+    });
+
 });
