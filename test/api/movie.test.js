@@ -3,9 +3,13 @@ const chaiHttp = require('chai-http');
 const should = chai.should();
 const server = require('../../app');
 
+const brcypt = require('bcrypt');
+const User = require('../../models/User');
 chai.use(chaiHttp);
 
 let token,movie_id;
+const name = "test";
+const password = "test123*";
 
 describe('Node Server',() => {
 
@@ -13,12 +17,28 @@ describe('Node Server',() => {
      * Testler çalışmadan önce çalışır.
      */
     before((done)=> {
+
+            
+            brcypt.hash(password,10).then((hash)=>{
+                
+                User.remove({ name:name },() => {
+                    
+                    const user = new User({
+                        name,password:hash
+                    });
+
+                    const promise = user.save();
+            
+                    promise.then((data)=>{
+                    });
+                });
+            });
             
             chai.request(server)
                 .post('/authenticate')
                 .send({
-                    name:'metinagaoglu1',
-                    password:'212121'
+                    name:name,
+                    password:password
                 })
                 .end((err,res) => {
                     if(!err) {
@@ -30,6 +50,7 @@ describe('Node Server',() => {
                     }
                 });
     });
+
     describe('/GET movie',() => {
         it('(/api/movies tests)',(done) => {
             chai.request(server)
@@ -108,5 +129,55 @@ describe('Node Server',() => {
                 });
             });
     });
+
+    describe('/PUT movie', () => {
+        it('it should PUT a movie', (done) => {
+            const movie = {
+                title: 'update',
+                director_id: '5b2e6510edb32304082bc910',
+                category: 'update',
+                country: 'update',
+                year:2000,
+                imdb_score: 9
+            }
+
+            chai.request(server)
+                .put('/api/movies/'+movie_id)
+                .send(movie)
+                .set('x-access-token',token)
+                .end((err,res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.be.a('object')
+                    res.body.should.have.property('status');
+                    res.body.status.should.equal(true);
+                    res.body.data.should.have.property('_id').eql(movie_id);
+                    res.body.data.should.have.property('title').eql('update');
+                    res.body.data.should.have.property('director_id');
+                    res.body.data.should.have.property('category').eql('update');
+                    res.body.data.should.have.property('country');
+                    res.body.data.should.have.property('imdb_score').eql(9);
+                    done();
+                });
+
+        });
+    });
+
+    describe('/DELETE movie', () => {
+        it('it should PUT a movie', (done) => {
+            console.log('del'+movie_id);
+            chai.request(server)
+                .delete('/api/movies/'+movie_id)
+                .set('x-access-token',token)
+                .end((err,res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.be.a('object')
+                    res.body.should.have.property('status');
+                    res.body.status.should.equal(true);
+                    done();
+                });
+
+        });
+    });
+
 
 });
