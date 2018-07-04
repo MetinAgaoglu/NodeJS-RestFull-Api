@@ -3,9 +3,13 @@ const chaiHttp = require('chai-http');
 const should = chai.should();
 const server = require('../../app');
 
+const brcypt = require('bcrypt');
+const User = require('../../models/User');
 chai.use(chaiHttp);
 
 let token,movie_id;
+const name = "test";
+const password = "test123*";
 
 describe('Node Server',() => {
 
@@ -13,12 +17,28 @@ describe('Node Server',() => {
      * Testler çalışmadan önce çalışır.
      */
     before((done)=> {
+
+            
+            brcypt.hash(password,10).then((hash)=>{
+                
+                User.remove({ name:name },() => {
+                    
+                    const user = new User({
+                        name,password:hash
+                    });
+
+                    const promise = user.save();
+            
+                    promise.then((data)=>{
+                    });
+                });
+            });
             
             chai.request(server)
                 .post('/authenticate')
                 .send({
-                    name:'metinagaoglu1',
-                    password:'212121'
+                    name:name,
+                    password:password
                 })
                 .end((err,res) => {
                     if(!err) {
@@ -30,6 +50,7 @@ describe('Node Server',() => {
                     }
                 });
     });
+
     describe('/GET movie',() => {
         it('(/api/movies tests)',(done) => {
             chai.request(server)
@@ -157,5 +178,6 @@ describe('Node Server',() => {
 
         });
     });
+
 
 });
