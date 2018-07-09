@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 module.exports = () => {
     //mongoose.connect('mongodb://movie_user:abcd1234@ds139436.mlab.com:39436/movie-api');
-    mongoose.connect('mongodb://localhost/myfirstdb');
+    mongoose.connect('mongodb://localhost/myfirstdb_test');
     
     mongoose.connection.on('open',()=>{
         console.log('MongoDB Connected...');

@@ -30,25 +30,27 @@ describe('Node Server',() => {
                     const promise = user.save();
             
                     promise.then((data)=>{
+
+                        chai.request(server)
+                            .post('/authenticate')
+                            .send({
+                                name:name,
+                                password:password
+                            })
+                            .end((err,res) => {
+                                if(!err) {
+                                    token = res.body.token;
+                                    console.log(token);
+                                    done();
+                                } else {
+                                    console.log('Token Exception!');
+                                }
+                            });
+
                     });
                 });
             });
             
-            chai.request(server)
-                .post('/authenticate')
-                .send({
-                    name:name,
-                    password:password
-                })
-                .end((err,res) => {
-                    if(!err) {
-                        token = res.body.token;
-                        console.log(token);
-                        done();
-                    } else {
-                        console.log('Token Exception!');
-                    }
-                });
     });
 
     describe('/GET movie',() => {
